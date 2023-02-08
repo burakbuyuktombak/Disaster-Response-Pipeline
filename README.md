@@ -38,3 +38,9 @@ Your project will also be graded based on the following:
 Use of Git and Github
 Strong documentation
 Clean and modular code
+
+# File Structure
+1. preparations directory - Includes Jupiter notebook files for ETL data processing and Machine Learning model build
+2. data - Includes messages and categories csv files, a python file "process_data.py" for data processing and a database file to store output records.
+3. models - Includes a python file "train_classifier.py". It produces a model pickle file to be used in webpage to predict the category of entered message.
+4. app - Includes "run.py" script allows to launch webpage.
