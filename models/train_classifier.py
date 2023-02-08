@@ -20,6 +20,8 @@ import pickle
 
 
 def load_data(database_filepath):
+    #load data from given database 
+    
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('ETL_Preparation', engine)
 
@@ -30,14 +32,20 @@ def load_data(database_filepath):
     return X, y, category_names
 
 def tokenize(text):
+    
+    #Punctuation removal
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
-
+    
+    #tokenize messages
     tokens = word_tokenize(text)
+    
+    #initiate lemmatizer
     lemmatizer = WordNetLemmatizer()
 
+    #lemmatize tokens 
     clean_tokens = []
     for tok in tokens:
         clean_tok = lemmatizer.lemmatize(tok).lower().strip()
@@ -47,6 +55,8 @@ def tokenize(text):
 
 
 def build_model():
+    
+    # building pipeline using randomforest classifier, TF-idf transformer and count vectorizer (Convert a collection of text documents to a matrix of token counts)
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -54,20 +64,25 @@ def build_model():
     ])
 
     pipeline.get_params()
-
+    
+    #changing some pipeline parameters
     parameters = {
        'clf__estimator__n_estimators': [10, 20, 40],
        'clf__estimator__min_samples_split': [2, 3, 4],
     
     }
     
+    #use gridsearchcv to pick up best parameters for the model
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=2, n_jobs=-1)
     
     return(cv)
     
 def evaluate_model(model, X_test, Y_test, category_names):
     
+    #run model
     Y_pred = model.predict(X_test)
+    
+    #print model scores for each category
     
     for i in range(36):
         print(Y_test.columns[i], ':')
@@ -76,6 +91,8 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    
+    #save model in a pickle file
     with open(model_filepath, 'wb') as file:
         pickle.dump(model, file)
 
