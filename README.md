@@ -44,3 +44,6 @@ Clean and modular code
 2. data - Includes messages and categories csv files, a python file "process_data.py" for data processing and a database file to store output records.
 3. models - Includes a python file "train_classifier.py". It produces a model pickle file to be used in webpage to predict the category of entered message.
 4. app - Includes "run.py" script allows to launch webpage.
+
+Screenshots of running scripts were added as JPEG files.
+Webpage results were saved as MHTML web pages(single files containing the contents of whole page) 
