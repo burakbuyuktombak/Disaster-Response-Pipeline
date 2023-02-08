@@ -48,7 +48,7 @@ Clean and modular code
 Screenshots of running scripts were added as JPEG files.
 Webpage results were saved as MHTML web pages(single files containing the contents of whole page) 
 
-#How to run scripts
+# How to run scripts
 
 *** Scripts have been run in given working environment without any errors.
 
