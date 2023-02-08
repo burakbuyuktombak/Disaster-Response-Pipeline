@@ -46,12 +46,15 @@ Clean and modular code
 4. app - Includes "run.py" script allows to launch webpage.
 
 *** IMPORTANT NOTE :
+
 *** Screenshots of running scripts were added as JPEG files.
+
 *** Webpage results were saved as MHTML web pages(single files containing the contents of whole page) 
 
 # How to run scripts
 
 *** IMPORTANT NOTE :
+
 *** Scripts have been run in given working environment without any errors.
 
 Instructions:
