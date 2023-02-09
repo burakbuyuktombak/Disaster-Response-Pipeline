@@ -3,6 +3,14 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
+    """
+    INPUT:
+    messages_filepath - path to messages csv file
+    categories_filepath - path to categories csv file
+    
+    OUTPUT:
+    df - Merged data
+    """    
     
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
@@ -11,6 +19,14 @@ def load_data(messages_filepath, categories_filepath):
     return df
 
 def clean_data(df):
+    """
+    INPUT:
+    df - Merged data
+    
+    OUTPUT:
+    df - Cleaned data
+    """    
+    
     categories = df['categories'].str.split(pat=';', expand = True)
     
     # select the first row of the categories dataframe
@@ -33,16 +49,32 @@ def clean_data(df):
     # drop the original categories column from 'df'
     df.drop(['categories'], axis=1, inplace=True)
     
-    # concatenate the original dataframe with the new 'categories' dataframe
+    # concatenate the original datafram with the new 'categories' dataframe
     df = pd.concat([df,categories], join='inner', axis=1)
     
     # drop duplicates
     df.drop_duplicates(inplace=True)
     
+    # drop 'child_alone' column as it has only 0 values 
+    df = df.drop('child_alone', axis = 1)
+    
+    # 'related' column has max value of 2, it could be error
+    # therefore, we will replace '2' with '0'
+    df['related'] = df['related'].map(lambda x: 0 if x==2 else x)
+    
     return df
 
 
 def save_data(df, database_filename):
+    """
+    INPUT:
+    df - cleaned data
+    database_filename - database filename for sqlite database with (.db) file type
+    
+    OUTPUT:
+    None - save cleaned data into database
+    """
+    
     engine = create_engine('sqlite:///'+ database_filename)
     df.to_sql('ETL_Preparation', engine, index = False, if_exists = 'replace')
 
