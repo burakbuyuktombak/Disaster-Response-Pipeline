@@ -20,7 +20,15 @@ import pickle
 
 
 def load_data(database_filepath):
-    #load data from given database 
+    """
+    INPUT:
+    database_filepath - 
+    
+    OUTPUT:
+    X - messages (input variable) 
+    y - categories of the messages (output variable)
+    category_names - category name for y
+    """
     
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('ETL_Preparation', engine)
@@ -32,20 +40,22 @@ def load_data(database_filepath):
     return X, y, category_names
 
 def tokenize(text):
+    """
+    INPUT:
+    text - raw text
     
-    #Punctuation removal
+    OUTPUT:
+    clean_tokens - tokenized messages
+    """    
+    
     url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
-    
-    #tokenize messages
+
     tokens = word_tokenize(text)
-    
-    #initiate lemmatizer
     lemmatizer = WordNetLemmatizer()
 
-    #lemmatize tokens 
     clean_tokens = []
     for tok in tokens:
         clean_tok = lemmatizer.lemmatize(tok).lower().strip()
@@ -55,8 +65,14 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    INPUT:
+    none
     
-    # building pipeline using randomforest classifier, TF-idf transformer and count vectorizer (Convert a collection of text documents to a matrix of token counts)
+    OUTPUT:
+    cv = ML model pipeline after performing grid search
+    """
+    
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
@@ -64,35 +80,47 @@ def build_model():
     ])
 
     pipeline.get_params()
-    
-    #changing some pipeline parameters
+
     parameters = {
        'clf__estimator__n_estimators': [10, 20, 40],
        'clf__estimator__min_samples_split': [2, 3, 4],
     
     }
     
-    #use gridsearchcv to pick up best parameters for the model
     cv = GridSearchCV(pipeline, param_grid=parameters, verbose=2, n_jobs=-1)
     
     return(cv)
     
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    INPUT:
+    model - ML model
+    X_test - test messages
+    y_test - categories for test messages
+    category_names - category name for y
     
-    #run model
+    OUTPUT:
+    none - print scores (precision, recall, f1-score) for each output category of the dataset.
+    """
+    
     Y_pred = model.predict(X_test)
     
-    #print model scores for each category
-    
-    for i in range(36):
+    for i in range(35):
         print(Y_test.columns[i], ':')
         print(classification_report(Y_test.iloc[:,i], Y_pred[:,i]), '...................................................')
 
 
 
 def save_model(model, model_filepath):
+    """
+    INPUT:
+    model - ML model
+    model_filepath - location to save the model
     
-    #save model in a pickle file
+    OUTPUT:
+    none
+    """
+    
     with open(model_filepath, 'wb') as file:
         pickle.dump(model, file)
 
